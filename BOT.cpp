@@ -22,9 +22,9 @@ class BOT
 	void add(T el, Node*& crr);		//Adds equal to the right for the purpose of counting inversions correctly
 
 	Node* root;
-
-public:
 	int inversions;					//Added for counting inversions
+public:
+	
 
 	BOT(std::vector<T> v = {});
 	BOT(const BOT<T>& other);
@@ -32,6 +32,8 @@ public:
 	~BOT();
 
 	void add(T);
+	int getInversions();
+	bool areSorted();
 
 	template<class TT>
 	friend std::ostream& operator<< (std::ostream& os, const BOT<TT>& bot);
@@ -97,7 +99,7 @@ void BOT<T>::add(T el, Node*& crr)
 	{
 		if (el < crr->value)
 		{
-			inversions += crr->rightSubT + 1;
+			inversions += crr->rightSubT + 1;	//inversions rise by the number of nodes in the right subtree of the node + the node itsef
 			add(el, crr->left);
 		}
 		else
@@ -117,12 +119,25 @@ void BOT<T>::add(T el)
 }
 
 template<class T>
+int BOT<T>::getInversions()
+{
+	return inversions;
+}
+
+template<class T>
+bool BOT<T>::areSorted()
+{
+	return getInversions() == 0;
+}
+
+template<class T>
 std::ostream& operator <<(std::ostream& os, const BOT<T>& bot)
 {
-	typename BOT<T>::Node* crr, *noSucc;
-	noSucc = (typename BOT<T>::Node*)INT_MIN;
+	typename BOT<T>::Node* crr, *noSuccessor;
+	noSuccessor = (typename BOT<T>::Node*)INT_MIN;
 	std::queue<typename BOT<T>::Node*> q;
-	q.push(bot.root);
+	if(bot.root)
+		q.push(bot.root);
 	q.push(nullptr);
 	while (q.size() > 1)
 	{
@@ -130,15 +145,15 @@ std::ostream& operator <<(std::ostream& os, const BOT<T>& bot)
 		q.pop();
 		if (crr != nullptr)
 		{
-			if (crr != noSucc)				
+			if (crr != noSuccessor)
 			{
 				os << crr->value << ' ';
 				if (crr->left)
 					q.push(crr->left);
-				else q.push(noSucc);
+				else q.push(noSuccessor);
 				if (crr->right)
 					q.push(crr->right);
-				else q.push(noSucc);
+				else q.push(noSuccessor);
 			}
 			else os << "N ";
 		}
